@@ -1,4 +1,4 @@
-const URL='https://dfjffbzbmkitmnsiifib.supabase.co', KEY='sb_publishable_ntEqcHgqsbxQbg_18j_ztg_IdYZcyfu', db=supabase.createClient(URL,KEY), app=document.querySelector('#app'), bucket='team-logos';
+const URL='https://dfjffbzbmkitmnsiifib.supabase.co', KEY='sb_publishable_ntEqcHgqsbxQbg_18j_ztg_IdYZcyfu', db=window.supabase?.createClient(URL,KEY), app=document.querySelector('#app'), bucket='team-logos';
 let teams=[], user=null, history=[], oldPos=new Map(), oldRanks=new Map(), uploadId=null;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const order=()=>[...teams].sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name));
@@ -16,4 +16,4 @@ function bind(){document.querySelector('#login')?.addEventListener('click',login
 function live(){app.innerHTML=`<main class="shell"><header><div><small>LIVE UPDATE</small><h1>คะแนนสด</h1></div>${nav('live')}</header><section class="list live">${order().map((t,i)=>row(t,i)).join('')}</section></main>`}
 function overlay(){document.body.className='overlay';app.innerHTML=`<section class="board"><header><div><small>OFFICIAL LEADERBOARD</small><h2>PUBG ตารางคะแนน</h2></div><b>● LIVE</b></header><div class="labels">RANK <span>TEAM</span> PTS</div>${order().slice(0,10).map((t,i)=>`<article class="o-row" data-id="${t.id}" data-rank="${i+1}"><b>${String(i+1).padStart(2,'0')}</b>${logo(t)}<strong>${esc(t.name)}</strong><b>${t.score}</b></article>`).join('')}</section>`}
 function render(){capture();let v=new URLSearchParams(location.search).get('view')||location.pathname.split('/').filter(Boolean).pop()||'admin';({admin,live,overlay}[v]||admin)();motion()}
-db.channel('score-live').on('postgres_changes',{event:'*',schema:'public',table:'teams'},read).subscribe();read();render();
+if(db){db.channel('score-live').on('postgres_changes',{event:'*',schema:'public',table:'teams'},read).subscribe();read();render()}else{app.innerHTML='<main class="shell"><section class="add"><h2>กำลังเชื่อมต่อระบบ</h2><p>โหลด Supabase ไม่สำเร็จ กรุณารีเฟรชหน้านี้อีกครั้ง</p></section></main>'}
