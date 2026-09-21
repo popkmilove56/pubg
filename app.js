@@ -1,4 +1,4 @@
-const URL='https://dfjffbzbmkitmnsiifib.supabase.co', KEY='sb_publishable_ntEqcHgqsbxQbg_18j_ztg_IdYZcyfu', db=window.supabase?.createClient(URL,KEY), app=document.querySelector('#app'), bucket='team-logos';
+const SUPABASE_URL='https://dfjffbzbmkitmnsiifib.supabase.co', KEY='sb_publishable_ntEqcHgqsbxQbg_18j_ztg_IdYZcyfu', db=window.supabase?.createClient(SUPABASE_URL,KEY), app=document.querySelector('#app'), bucket='team-logos';
 let teams=[], user=null, history=[], oldPos=new Map(), oldRanks=new Map(), uploadId=null;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const order=()=>[...teams].sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name));
