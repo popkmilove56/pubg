@@ -1,64 +1,19 @@
-const KEY = 'pubg-scoreboard-v1';
-const SUPABASE_URL = 'https://dfjffbzbmkitmnsiifib.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ntEqcHgqsbxQbg_18j_ztg_IdYZcyfu';
-const db = window.supabase?.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-const channel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('pubg-scoreboard') : null;
-const initialTeams = ['NEXLABS','KRAKEN','RAVEN','KAZE','VIRE','NOVA','BLITZ','SRI','TITAN','ECHO'].map((name, i) => ({ id: crypto.randomUUID(), name, score: Math.max(0, 22 - i * 2), logo: '' }));
-const app = document.querySelector('#app');
-
-function load() { try { return JSON.parse(localStorage.getItem(KEY)) || initialTeams; } catch { return initialTeams; } }
-let teams = load();
-let history = [];
-let persistedIds = new Set();
-let signedInUser = null;
-const save = () => { localStorage.setItem(KEY, JSON.stringify(teams)); channel?.postMessage(teams); if (db) syncSupabase(); else fetch('/api/state', {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(teams)}).catch(() => {}); render(); };
-const remember = () => { history.push(JSON.stringify(teams)); if (history.length > 20) history.shift(); };
-async function loadSupabase() {
-  if (!db) return;
-  const { data: session } = await db.auth.getSession(); signedInUser = session.session?.user || null;
-  const { data, error } = await db.from('teams').select('*');
-  if (!error && data?.length) { teams = data; persistedIds = new Set(data.map(t => t.id)); render(); }
-}
-async function syncSupabase() {
-  if (!signedInUser) return;
-  const ids = new Set(teams.map(t => t.id));
-  const removed = [...persistedIds].filter(id => !ids.has(id));
-  if (removed.length) await db.from('teams').delete().in('id', removed);
-  const { error } = await db.from('teams').upsert(teams);
-  if (error) return alert(`บันทึก Supabase ไม่สำเร็จ: ${error.message}`);
-  persistedIds = ids;
-}
-function requireAdmin() { if (!db || signedInUser) return true; alert('กรุณาล็อกอินแอดมินก่อนแก้คะแนน'); return false; }
-async function loginAdmin() {
-  const email = prompt('อีเมลแอดมิน Supabase'); if (!email) return;
-  const password = prompt('รหัสผ่าน'); if (!password) return;
-  const { error } = await db.auth.signInWithPassword({ email, password });
-  if (error) return alert(`ล็อกอินไม่สำเร็จ: ${error.message}`);
-  await loadSupabase(); render();
-}
-const sorted = () => [...teams].sort((a,b) => b.score - a.score || a.name.localeCompare(b.name));
-const esc = (text) => String(text).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-const logo = (team) => team.logo ? `<img class="logo" src="${esc(team.logo)}" onerror="this.remove()" alt="">` : `<span class="logo"></span>`;
-const links = (active) => `<nav class="nav"><a class="${active==='admin'?'active':''}" href="?view=admin">ควบคุมคะแนน</a><a class="${active==='live'?'active':''}" href="?view=live">ดูคะแนนสด</a><a href="?view=overlay" target="_blank">เปิด Overlay OBS</a></nav>`;
-
-function admin() {
-  const rows = sorted().map((t,i) => `<div class="team-row score-grid"><div class="rank">${i+1}</div><div class="team-name">${logo(t)}<span class="team-title">${esc(t.name)}</span></div><div class="score">${t.score}</div><div class="controls"><button class="round minus" data-change="-1" data-id="${t.id}">−</button><button class="round plus" data-change="1" data-id="${t.id}">+</button><button class="round" data-remove="${t.id}" title="ลบทีม">×</button></div></div>`).join('');
-  document.body.className = '';
-  const auth = db ? (signedInUser ? `<button id="logout" class="button">ออกจากระบบ</button>` : `<button id="login" class="button primary">ล็อกอินแอดมิน</button>`) : '';
-  app.innerHTML = `<div class="shell"><div class="topbar"><div><h1>PUBG Scoreboard</h1><p class="subtitle">กดคะแนนแล้วหน้า OBS และหน้าดูคะแนนจะอัปเดตทันที</p></div>${links('admin')}</div><div class="notice">ตอนนี้มี ${teams.length}/25 ทีม · ${db ? (signedInUser ? 'เชื่อมต่อ Supabase แล้ว' : 'ต้องล็อกอินก่อนแก้คะแนน') : 'ข้อมูลบันทึกในเบราว์เซอร์เครื่องนี้'}</div>${auth}<form class="editor" id="add-team"><input name="name" required maxlength="32" placeholder="ชื่อทีม เช่น NEXLABS"><input name="logo" placeholder="ลิงก์โลโก้ (ไม่บังคับ)"><input name="score" type="number" value="0" min="0" placeholder="คะแนนเริ่มต้น"><button class="button primary">+ เพิ่มทีม</button></form><div class="score-head score-grid"><span>อันดับ</span><span>ทีม</span><span>คะแนน</span><span></span></div><section>${rows || '<div class="empty">ยังไม่มีทีม — เพิ่มทีมแรกด้านบน</div>'}</section><div class="tools"><button id="undo" class="button">↶ ย้อนกลับ 1 ครั้ง</button><button id="reset" class="button danger">รีเซ็ตคะแนนทั้งหมด</button></div></div>`;
-  document.querySelector('#login')?.addEventListener('click', loginAdmin);
-  document.querySelector('#logout')?.addEventListener('click', async () => { await db.auth.signOut(); signedInUser=null; render(); });
-  document.querySelectorAll('[data-change]').forEach(b => b.onclick = () => { if(!requireAdmin()) return; remember(); const t=teams.find(x=>x.id===b.dataset.id); t.score=Math.max(0,t.score+Number(b.dataset.change)); save(); });
-  document.querySelectorAll('[data-remove]').forEach(b => b.onclick = () => { if(!requireAdmin()) return; remember(); teams=teams.filter(t=>t.id!==b.dataset.remove); save(); });
-  document.querySelector('#add-team').onsubmit = e => { e.preventDefault(); if(!requireAdmin()) return; if(teams.length>=25) return alert('เพิ่มได้สูงสุด 25 ทีม'); remember(); const f=new FormData(e.target); teams.push({id:crypto.randomUUID(),name:f.get('name').trim(),logo:f.get('logo').trim(),score:Number(f.get('score'))||0}); e.target.reset(); save(); };
-  document.querySelector('#reset').onclick = () => { if(!requireAdmin()) return; if(confirm('รีเซ็ตคะแนนทุกทีมเป็น 0?')) { remember(); teams.forEach(t=>t.score=0); save(); } };
-  document.querySelector('#undo').onclick = () => { const previous=history.pop(); if(previous) { teams=JSON.parse(previous); save(); } };
-}
-function overlay() { document.body.className='overlay-body'; const rows=sorted().slice(0,10).map((t,i)=>`<div class="overlay-row"><span class="overlay-rank">${i+1}</span>${logo(t)}<span class="team-title">${esc(t.name)}</span><span class="overlay-score">${t.score}</span></div>`).join(''); app.innerHTML=`<section class="overlay"><div class="overlay-title"><strong>PUBG ตารางคะแนน</strong><span>LIVE SCORE</span></div>${rows}</section>`; }
-function live() { const rows=sorted().map((t,i)=>`<div class="team-row score-grid"><div class="rank">${i+1}</div><div class="team-name">${logo(t)}<span class="team-title">${esc(t.name)}</span></div><div class="score">${t.score}</div></div>`).join(''); document.body.className=''; app.innerHTML=`<div class="shell"><div class="topbar"><div><h1>คะแนนสด</h1><p class="subtitle">อัปเดตอัตโนมัติ</p></div>${links('live')}</div><section class="live-card"><div class="score-head score-grid"><span>อันดับ</span><span>ทีม</span><span>คะแนน</span></div>${rows}</section></div>`; }
-function render() { const pathView = location.pathname.split('/').filter(Boolean).pop(); const view=new URLSearchParams(location.search).get('view') || pathView || 'admin'; ({admin,live,overlay}[view] || admin)(); }
-channel && (channel.onmessage = e => { teams=e.data; render(); });
-window.addEventListener('storage', e => { if(e.key===KEY) { teams=load(); render(); }});
-if (db) { loadSupabase(); db.channel('teams-live').on('postgres_changes', {event:'*', schema:'public', table:'teams'}, loadSupabase).subscribe(); }
-else { fetch('/api/state').then(r => r.ok ? r.json() : Promise.reject()).then(data => { if (Array.isArray(data) && data.length) { teams=data; render(); } }).catch(() => {}); try { const updates = new EventSource('/events'); updates.onmessage = e => { const next=JSON.parse(e.data); if (Array.isArray(next)) { teams=next; localStorage.setItem(KEY, JSON.stringify(teams)); render(); } }; } catch { /* opened directly from a file */ } }
-render();
+const URL='https://dfjffbzbmkitmnsiifib.supabase.co', KEY='sb_publishable_ntEqcHgqsbxQbg_18j_ztg_IdYZcyfu', db=supabase.createClient(URL,KEY), app=document.querySelector('#app'), bucket='team-logos';
+let teams=[], user=null, history=[], oldPos=new Map(), oldRanks=new Map(), uploadId=null;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const order=()=>[...teams].sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name));
+const logo=t=>t.logo?`<img class="logo" src="${esc(t.logo)}" alt="">`:`<span class="logo placeholder">${esc(t.name[0]||'?')}</span>`;
+function capture(){oldPos=new Map([...document.querySelectorAll('[data-id]')].map(e=>[e.dataset.id,e.getBoundingClientRect()]));}
+function motion(){let ranks=new Map;document.querySelectorAll('[data-id]').forEach(e=>{let p=oldPos.get(e.dataset.id),n=e.getBoundingClientRect(),r=+e.dataset.rank;ranks.set(e.dataset.id,r);if(p&&Math.abs(p.top-n.top)>1){e.style.transition='none';e.style.transform=`translateY(${p.top-n.top}px)`;requestAnimationFrame(()=>requestAnimationFrame(()=>{e.style.transition='transform .62s cubic-bezier(.22,1,.36,1)';e.style.transform=''}));}if(oldRanks.has(e.dataset.id)&&oldRanks.get(e.dataset.id)!==r){e.classList.add('changed');setTimeout(()=>e.classList.remove('changed'),850)}});oldRanks=ranks}
+async function read(){let s=await db.auth.getSession();user=s.data.session?.user||null;let q=await db.from('teams').select('*');if(!q.error){teams=q.data||[];render()}}
+async function save(){if(!user)return alert('กรุณาล็อกอินแอดมิน');let q=await db.from('teams').upsert(teams);if(q.error)alert(q.error.message);render()}
+async function login(){let email=prompt('อีเมลแอดมิน Supabase'),password=prompt('รหัสผ่าน');if(!email||!password)return;let q=await db.auth.signInWithPassword({email,password});if(q.error)alert(q.error.message);else read()}
+async function upload(file,id){if(!file)return;if(!['image/png','image/jpeg'].includes(file.type))return alert('รองรับ PNG / JPG / JPEG เท่านั้น');if(file.size>2097152)return alert('ไฟล์ใหญ่เกิน 2 MB');let ext=file.type==='image/png'?'png':'jpg',path=`${user.id}/${id}-${Date.now()}.${ext}`,q=await db.storage.from(bucket).upload(path,file,{contentType:file.type});if(q.error)return alert(q.error.message);let t=teams.find(x=>x.id===id);t.logo=db.storage.from(bucket).getPublicUrl(path).data.publicUrl;save()}
+const nav=a=>`<nav><a class="${a==='admin'?'on':''}" href="/admin">ควบคุม</a><a class="${a==='live'?'on':''}" href="/live">คะแนนสด</a><a href="/overlay" target="_blank">OBS Overlay ↗</a></nav>`;
+function row(t,i,admin=false){return `<article class="row" data-id="${t.id}" data-rank="${i+1}"><b class="rank">${String(i+1).padStart(2,'0')}</b><div class="team">${logo(t)}<strong>${esc(t.name)}</strong></div><b class="points">${t.score}</b>${admin?`<div class="actions"><button data-up="${t.id}">↑</button><button data-score="-1" data-id="${t.id}">−</button><button class="plus" data-score="1" data-id="${t.id}">+</button><button class="del" data-del="${t.id}">×</button></div>`:''}</article>`}
+function admin(){let rows=order().map((t,i)=>row(t,i,true)).join('');app.innerHTML=`<main class="shell"><header><div><small>PUBG TOURNAMENT CONTROL</small><h1>Live Scoreboard</h1><p>จัดอันดับแบบเรียลไทม์สำหรับสตรีม</p></div><div>${user?`<button id="logout">ออกจากระบบ</button>`:`<button id="login" class="primary">ล็อกอินแอดมิน</button>`}${nav('admin')}</div></header><div class="status"><i></i>${teams.length}/25 ทีม · ${user?'เชื่อมต่อ Supabase แล้ว':'ล็อกอินก่อนแก้ไขคะแนน'}</div><section class="add"><h2>เพิ่มทีม</h2><form id="add"><input name="name" required placeholder="ชื่อทีม"><input name="score" type="number" value="0" min="0" placeholder="คะแนน"><button class="primary">+ เพิ่มทีม</button></form><em>กด ↑ ข้างทีมเพื่ออัปโหลดโลโก้ PNG/JPG ไม่เกิน 2 MB</em></section><div class="head"><span>RANK</span><span>TEAM</span><span>PTS</span><span>CONTROL</span></div><section class="list">${rows||'<p class="empty">ยังไม่มีทีม</p>'}</section><input id="file" hidden type="file" accept="image/png,image/jpeg"><footer><button id="undo">↶ ย้อนกลับ</button><button id="reset" class="danger">รีเซ็ตคะแนน</button></footer></main>`;bind()}
+function bind(){document.querySelector('#login')?.addEventListener('click',login);document.querySelector('#logout')?.addEventListener('click',async()=>{await db.auth.signOut();read()});document.querySelectorAll('[data-score]').forEach(b=>b.onclick=()=>{if(!user)return login();history.push(JSON.stringify(teams));let t=teams.find(x=>x.id===b.dataset.id);t.score=Math.max(0,t.score+(+b.dataset.score));save()});document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(user&&confirm('ลบทีมนี้?')){teams=teams.filter(t=>t.id!==b.dataset.del);db.from('teams').delete().eq('id',b.dataset.del);save()}});document.querySelectorAll('[data-up]').forEach(b=>b.onclick=()=>{if(!user)return login();uploadId=b.dataset.up;document.querySelector('#file').click()});document.querySelector('#file').onchange=e=>upload(e.target.files[0],uploadId);document.querySelector('#add').onsubmit=e=>{e.preventDefault();if(!user)return login();if(teams.length>=25)return alert('สูงสุด 25 ทีม');let f=new FormData(e.target);teams.push({id:crypto.randomUUID(),name:f.get('name'),score:+f.get('score')||0,logo:''});e.target.reset();save()};document.querySelector('#reset').onclick=()=>{if(user&&confirm('รีเซ็ตคะแนน?')){teams.forEach(t=>t.score=0);save()}};document.querySelector('#undo').onclick=()=>{let h=history.pop();if(h){teams=JSON.parse(h);save()}}}
+function live(){app.innerHTML=`<main class="shell"><header><div><small>LIVE UPDATE</small><h1>คะแนนสด</h1></div>${nav('live')}</header><section class="list live">${order().map((t,i)=>row(t,i)).join('')}</section></main>`}
+function overlay(){document.body.className='overlay';app.innerHTML=`<section class="board"><header><div><small>OFFICIAL LEADERBOARD</small><h2>PUBG ตารางคะแนน</h2></div><b>● LIVE</b></header><div class="labels">RANK <span>TEAM</span> PTS</div>${order().slice(0,10).map((t,i)=>`<article class="o-row" data-id="${t.id}" data-rank="${i+1}"><b>${String(i+1).padStart(2,'0')}</b>${logo(t)}<strong>${esc(t.name)}</strong><b>${t.score}</b></article>`).join('')}</section>`}
+function render(){capture();let v=location.pathname.split('/').filter(Boolean).pop()||'admin';({admin,live,overlay}[v]||admin)();motion()}
+db.channel('score-live').on('postgres_changes',{event:'*',schema:'public',table:'teams'},read).subscribe();read();render();
