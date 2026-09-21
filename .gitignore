@@ -1,0 +1,9 @@
+# Local development score cache
+scores.json
+
+# Vercel local metadata
+.vercel/
+
+# Dependencies and logs
+node_modules/
+*.log
