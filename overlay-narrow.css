@@ -1,10 +1,11 @@
 /* Tighter side margins for a more compact OBS source. */
-.overlay .board.match-board{width:300px!important;max-width:300px!important;margin:0!important;padding:0!important}
+.overlay .board.match-board{width:280px!important;max-width:280px!important;margin:0!important;padding:0!important}
 .overlay .overlay-title{padding-left:4px;padding-right:4px}
 .overlay .score-head,.overlay .score-row{padding-left:3px!important;padding-right:3px!important}
 .overlay .score-head,.overlay .score-row{grid-template-columns:23px minmax(0,1fr) 31px 34px;column-gap:1px}
 .overlay .score-row .team{gap:5px}
 .overlay .score-row .team strong{font-size:14px}
-.overlay .score-row .logo{width:16px;height:16px}
+.overlay .score-row{min-height:34px;height:34px}
+.overlay .score-row .logo{width:23px;height:23px}
 .overlay .score-row .display-score,.overlay .score-row .display-kills{font-size:16px}
-@media(max-width:720px){.overlay .match-board{width:100vw}}
+@media(max-width:720px){.overlay .match-board{width:100vw!important;max-width:none!important}}
