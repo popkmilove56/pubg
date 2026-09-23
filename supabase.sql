@@ -4,8 +4,64 @@ create table if not exists public.teams (
   name text not null check (char_length(name) between 1 and 32),
   logo text not null default '',
   score integer not null default 0 check (score >= 0),
+  kills integer not null default 0 check (kills >= 0),
   created_at timestamptz not null default now()
 );
+
+-- Safe for projects that created the teams table before KILLS was added.
+alter table public.teams add column if not exists kills integer not null default 0 check (kills >= 0);
+
+-- A tournament has one draft map at a time. Only saved maps contribute to standings.
+create table if not exists public.tournaments (
+  id uuid primary key default gen_random_uuid(),
+  name text not null check (char_length(name) between 1 and 64),
+  total_maps integer not null check (total_maps between 1 and 20),
+  current_map integer not null default 1,
+  status text not null default 'active' check (status in ('active','complete')),
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.maps (
+  id uuid primary key default gen_random_uuid(),
+  tournament_id uuid not null references public.tournaments(id) on delete cascade,
+  map_number integer not null check (map_number > 0),
+  status text not null default 'draft' check (status in ('draft','saved')),
+  created_at timestamptz not null default now(),
+  unique (tournament_id, map_number)
+);
+
+create table if not exists public.map_scores (
+  id uuid primary key default gen_random_uuid(),
+  map_id uuid not null references public.maps(id) on delete cascade,
+  team_id uuid not null references public.teams(id) on delete cascade,
+  kills integer not null default 0 check (kills >= 0),
+  placement_points integer not null default 0 check (placement_points >= 0),
+  created_at timestamptz not null default now(),
+  unique (map_id, team_id)
+);
+
+alter table public.tournaments enable row level security;
+alter table public.maps enable row level security;
+alter table public.map_scores enable row level security;
+
+drop policy if exists "public can view tournaments" on public.tournaments;
+drop policy if exists "admins manage tournaments" on public.tournaments;
+create policy "public can view tournaments" on public.tournaments for select using (true);
+create policy "admins manage tournaments" on public.tournaments for all to authenticated using (true) with check (true);
+
+drop policy if exists "public can view maps" on public.maps;
+drop policy if exists "admins manage maps" on public.maps;
+create policy "public can view maps" on public.maps for select using (true);
+create policy "admins manage maps" on public.maps for all to authenticated using (true) with check (true);
+
+drop policy if exists "public can view map scores" on public.map_scores;
+drop policy if exists "admins manage map scores" on public.map_scores;
+create policy "public can view map scores" on public.map_scores for select using (true);
+create policy "admins manage map scores" on public.map_scores for all to authenticated using (true) with check (true);
+
+alter publication supabase_realtime add table public.tournaments;
+alter publication supabase_realtime add table public.maps;
+alter publication supabase_realtime add table public.map_scores;
 
 alter table public.teams enable row level security;
 
