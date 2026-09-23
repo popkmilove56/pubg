@@ -6,7 +6,7 @@ const logo=t=>t.logo?`<img class="logo" src="${esc(t.logo)}" alt="">`:`<span cla
 const current=()=>maps.find(m=>m.map_number===tournament?.current_map);
 const eventTeams=()=>tournament?.team_ids?.length?teams.filter(t=>tournament.team_ids.includes(t.id)):teams;
 const dFor=id=>draft[id]||{kills:0,placement_points:0};
-function totals(){let visible=new Set(maps.filter(m=>m.status==='live'||m.status==='completed').map(m=>m.id)),out=eventTeams().map(t=>({id:t.id,name:t.name,logo:t.logo,points:0,kills:0}));scores.filter(s=>visible.has(s.map_id)).forEach(s=>{let t=out.find(x=>x.id===s.team_id);if(t){t.points+=(s.kills||0)+(s.placement_points||0);t.kills+=s.kills||0}});return rank(out)}
+function totals(){let cm=current(),visible=new Set(maps.filter(m=>m.status==='live'||m.status==='completed').map(m=>m.id)),out=eventTeams().map(t=>({id:t.id,name:t.name,logo:t.logo,points:0,kills:0}));scores.filter(s=>visible.has(s.map_id)&&s.map_id!==cm?.id).forEach(s=>{let t=out.find(x=>x.id===s.team_id);if(t){t.points+=(s.kills||0)+(s.placement_points||0);t.kills+=s.kills||0}});if(cm?.status==='live')out.forEach(t=>{let d=dFor(t.id);t.points+=d.kills+d.placement_points;t.kills+=d.kills});return rank(out)}
 function capture(){oldPos=new Map([...document.querySelectorAll('[data-id]')].map(e=>[e.dataset.id,e.getBoundingClientRect()]));}
 function motion(){}
 function setSave(text,state='saved'){document.querySelectorAll('[data-save-state]').forEach(e=>{e.textContent=text;e.dataset.state=state})}

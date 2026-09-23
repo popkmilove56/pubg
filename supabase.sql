@@ -83,20 +83,35 @@ drop policy if exists "admins manage map scores" on public.map_scores;
 create policy "public can view map scores" on public.map_scores for select using (true);
 create policy "admins manage map scores" on public.map_scores for all to authenticated using (true) with check (true);
 
-alter publication supabase_realtime add table public.tournaments;
-alter publication supabase_realtime add table public.categories;
-alter publication supabase_realtime add table public.maps;
-alter publication supabase_realtime add table public.map_scores;
-
 alter table public.teams enable row level security;
 
+drop policy if exists "public can view teams" on public.teams;
+drop policy if exists "signed-in admins manage teams" on public.teams;
 create policy "public can view teams" on public.teams
 for select using (true);
 
 create policy "signed-in admins manage teams" on public.teams
 for all to authenticated using (true) with check (true);
 
-alter publication supabase_realtime add table public.teams;
+-- Add every live table once. Safe to run repeatedly.
+do $$
+begin
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'teams') then
+    alter publication supabase_realtime add table public.teams;
+  end if;
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'categories') then
+    alter publication supabase_realtime add table public.categories;
+  end if;
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'tournaments') then
+    alter publication supabase_realtime add table public.tournaments;
+  end if;
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'maps') then
+    alter publication supabase_realtime add table public.maps;
+  end if;
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'map_scores') then
+    alter publication supabase_realtime add table public.map_scores;
+  end if;
+end $$;
 
 -- โลโก้ทีม: PNG/JPG/JPEG ขนาดสูงสุด 2 MB
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
