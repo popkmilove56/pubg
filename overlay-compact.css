@@ -11,4 +11,13 @@
 .overlay .score-row .placeholder{font-size:13px}
 .overlay .score-row .team strong{font:800 18px/1 'Barlow Condensed',Arial,sans-serif;letter-spacing:.015em}
 .overlay .score-row .display-score,.overlay .score-row .display-kills{font:800 20px/1 'Barlow Condensed',Arial,sans-serif}
+/* Keep first place as the only strong podium accent in the compact overlay. */
+.overlay .score-row .rank{color:#aeb6af}
+.overlay .score-row.podium-1 .rank{color:#f2c75c}
+.overlay .score-row.podium-2 .rank{color:#d6ddd7}
+.overlay .score-row.podium-3 .rank{color:#bd926b}
+.overlay .score-row:nth-child(n+5) .rank{color:#959e97}
+/* Lower ranks recede slightly, so names and live scores stay easier to scan. */
+.overlay .score-row:nth-child(n+5) .team strong{color:#d7ddd8}
+.overlay .score-row:nth-child(n+5) .display-score,.overlay .score-row:nth-child(n+5) .display-kills{color:#c7cec8}
 @media(max-width:720px){.overlay .match-board{width:100vw}.overlay .score-head,.overlay .score-row{grid-template-columns:30px minmax(0,1fr) 44px 47px}.overlay .score-row{height:28px;min-height:28px}.overlay .score-row .team strong{font-size:17px}}
