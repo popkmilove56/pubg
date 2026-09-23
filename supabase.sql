@@ -54,7 +54,9 @@ create table if not exists public.map_scores (
 -- Migration for a database created with the earlier draft/saved map workflow.
 alter table public.maps drop constraint if exists maps_status_check;
 update public.maps set status = case status when 'draft' then 'live' when 'saved' then 'completed' else status end;
-alter table public.maps add constraint maps_status_check check (status in ('live','completed'));
+-- Keep legacy values valid during migration, so a partially upgraded project
+-- can still create the current live map without a constraint error.
+alter table public.maps add constraint maps_status_check check (status in ('draft','saved','live','completed'));
 
 alter table public.tournaments enable row level security;
 alter table public.categories enable row level security;
