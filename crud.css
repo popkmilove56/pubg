@@ -1,2 +1,7 @@
 .tournament-card.is-archived,.team-library-row.is-archived{opacity:.55}
 .card-actions button{min-height:35px;padding:0 10px;font-size:10px}
+.crud-field{display:grid;gap:4px;margin-top:8px}
+.crud-field span{color:var(--muted);font:800 9px Inter;letter-spacing:.08em}
+.crud-field input{width:100%;min-height:32px;border:1px solid var(--line);background:var(--surface2);color:var(--text);padding:0 9px;font:600 14px Inter}
+.crud-field input:focus{outline:1px solid var(--bright);border-color:var(--bright)}
+@media(max-width:720px){.card-actions{flex-wrap:wrap}.card-actions a,.card-actions button{flex:1}.crud-field input{min-width:0}}
