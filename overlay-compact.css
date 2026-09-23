@@ -1,0 +1,14 @@
+/* Dense broadcast treatment: closer to the compact original reference. */
+.overlay .match-board{width:480px;background:rgba(7,9,8,.98);font-family:'Barlow Condensed',Arial,sans-serif}
+.overlay .overlay-title{height:25px;padding:0 8px;font:700 11px/1 Inter,Arial,sans-serif;letter-spacing:.05em}
+.overlay .score-head,.overlay .score-row{grid-template-columns:34px minmax(0,1fr) 48px 52px;column-gap:5px}
+.overlay .score-head{height:27px;padding:0 7px;font:800 11px/1 'Barlow Condensed',Arial,sans-serif;letter-spacing:.04em}
+.overlay .score-head span:nth-child(n+3){font-size:10px}
+.overlay .score-row{min-height:29px;height:29px;padding:0 7px}
+.overlay .score-row .rank{font:800 19px/1 'Barlow Condensed',Arial,sans-serif}
+.overlay .score-row .team{gap:6px}
+.overlay .score-row .logo{width:20px;height:20px}
+.overlay .score-row .placeholder{font-size:13px}
+.overlay .score-row .team strong{font:800 18px/1 'Barlow Condensed',Arial,sans-serif;letter-spacing:.015em}
+.overlay .score-row .display-score,.overlay .score-row .display-kills{font:800 20px/1 'Barlow Condensed',Arial,sans-serif}
+@media(max-width:720px){.overlay .match-board{width:100vw}.overlay .score-head,.overlay .score-row{grid-template-columns:30px minmax(0,1fr) 44px 47px}.overlay .score-row{height:28px;min-height:28px}.overlay .score-row .team strong{font-size:17px}}

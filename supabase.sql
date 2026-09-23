@@ -11,7 +11,7 @@ create table if not exists public.teams (
 -- Safe for projects that created the teams table before KILLS was added.
 alter table public.teams add column if not exists kills integer not null default 0 check (kills >= 0);
 
--- A tournament has one draft map at a time. Only saved maps contribute to standings.
+-- A tournament has one live map at a time. Live and completed maps contribute to standings.
 create table if not exists public.tournaments (
   id uuid primary key default gen_random_uuid(),
   name text not null check (char_length(name) between 1 and 64),
@@ -25,7 +25,7 @@ create table if not exists public.maps (
   id uuid primary key default gen_random_uuid(),
   tournament_id uuid not null references public.tournaments(id) on delete cascade,
   map_number integer not null check (map_number > 0),
-  status text not null default 'draft' check (status in ('draft','saved')),
+  status text not null default 'live' check (status in ('live','completed')),
   created_at timestamptz not null default now(),
   unique (tournament_id, map_number)
 );
@@ -39,6 +39,11 @@ create table if not exists public.map_scores (
   created_at timestamptz not null default now(),
   unique (map_id, team_id)
 );
+
+-- Migration for a database created with the earlier draft/saved map workflow.
+alter table public.maps drop constraint if exists maps_status_check;
+update public.maps set status = case status when 'draft' then 'live' when 'saved' then 'completed' else status end;
+alter table public.maps add constraint maps_status_check check (status in ('live','completed'));
 
 alter table public.tournaments enable row level security;
 alter table public.maps enable row level security;

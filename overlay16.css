@@ -1,0 +1,6 @@
+/* Keep a 16-team OBS leaderboard compact without sacrificing readability. */
+.overlay .score-row{min-height:34px;padding:4px 10px;border-color:#4e564f}
+.overlay .score-row .rank{font-size:20px}
+.overlay .score-row .team strong{font:800 19px/1 'Barlow Condensed'}
+.overlay .score-row .display-score,.overlay .score-row .display-kills{font-size:21px}
+@media(max-width:720px){.overlay .score-row{min-height:32px;padding:3px 6px}.overlay .score-row .team strong{font-size:17px}}
