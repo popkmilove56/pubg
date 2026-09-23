@@ -17,6 +17,7 @@ create table if not exists public.tournaments (
   name text not null check (char_length(name) between 1 and 64),
   category text not null default 'Uncategorized' check (char_length(category) between 1 and 32),
   team_ids uuid[] not null default '{}',
+  team_slots jsonb not null default '[]'::jsonb,
   total_maps integer not null check (total_maps between 1 and 20),
   current_map integer not null default 1,
   status text not null default 'active' check (status in ('active','complete')),
@@ -25,6 +26,7 @@ create table if not exists public.tournaments (
 
 alter table public.tournaments add column if not exists category text not null default 'Uncategorized' check (char_length(category) between 1 and 32);
 alter table public.tournaments add column if not exists team_ids uuid[] not null default '{}';
+alter table public.tournaments add column if not exists team_slots jsonb not null default '[]'::jsonb;
 
 create table if not exists public.categories (
   id uuid primary key default gen_random_uuid(),
