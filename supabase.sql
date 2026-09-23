@@ -5,11 +5,13 @@ create table if not exists public.teams (
   logo text not null default '',
   score integer not null default 0 check (score >= 0),
   kills integer not null default 0 check (kills >= 0),
+  active boolean not null default true,
   created_at timestamptz not null default now()
 );
 
 -- Safe for projects that created the teams table before KILLS was added.
 alter table public.teams add column if not exists kills integer not null default 0 check (kills >= 0);
+alter table public.teams add column if not exists active boolean not null default true;
 
 -- A tournament has one live map at a time. Live and completed maps contribute to standings.
 create table if not exists public.tournaments (
@@ -20,13 +22,15 @@ create table if not exists public.tournaments (
   team_slots jsonb not null default '[]'::jsonb,
   total_maps integer not null check (total_maps between 1 and 20),
   current_map integer not null default 1,
-  status text not null default 'active' check (status in ('active','complete')),
+  status text not null default 'active' check (status in ('active','complete','archived')),
   created_at timestamptz not null default now()
 );
 
 alter table public.tournaments add column if not exists category text not null default 'Uncategorized' check (char_length(category) between 1 and 32);
 alter table public.tournaments add column if not exists team_ids uuid[] not null default '{}';
 alter table public.tournaments add column if not exists team_slots jsonb not null default '[]'::jsonb;
+alter table public.tournaments drop constraint if exists tournaments_status_check;
+alter table public.tournaments add constraint tournaments_status_check check (status in ('active','complete','archived'));
 
 create table if not exists public.categories (
   id uuid primary key default gen_random_uuid(),
