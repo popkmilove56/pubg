@@ -15,9 +15,20 @@ alter table public.teams add column if not exists kills integer not null default
 create table if not exists public.tournaments (
   id uuid primary key default gen_random_uuid(),
   name text not null check (char_length(name) between 1 and 64),
+  category text not null default 'Uncategorized' check (char_length(category) between 1 and 32),
+  team_ids uuid[] not null default '{}',
   total_maps integer not null check (total_maps between 1 and 20),
   current_map integer not null default 1,
   status text not null default 'active' check (status in ('active','complete')),
+  created_at timestamptz not null default now()
+);
+
+alter table public.tournaments add column if not exists category text not null default 'Uncategorized' check (char_length(category) between 1 and 32);
+alter table public.tournaments add column if not exists team_ids uuid[] not null default '{}';
+
+create table if not exists public.categories (
+  id uuid primary key default gen_random_uuid(),
+  name text not null unique check (char_length(name) between 1 and 32),
   created_at timestamptz not null default now()
 );
 
@@ -46,6 +57,7 @@ update public.maps set status = case status when 'draft' then 'live' when 'saved
 alter table public.maps add constraint maps_status_check check (status in ('live','completed'));
 
 alter table public.tournaments enable row level security;
+alter table public.categories enable row level security;
 alter table public.maps enable row level security;
 alter table public.map_scores enable row level security;
 
@@ -53,6 +65,11 @@ drop policy if exists "public can view tournaments" on public.tournaments;
 drop policy if exists "admins manage tournaments" on public.tournaments;
 create policy "public can view tournaments" on public.tournaments for select using (true);
 create policy "admins manage tournaments" on public.tournaments for all to authenticated using (true) with check (true);
+
+drop policy if exists "public can view categories" on public.categories;
+drop policy if exists "admins manage categories" on public.categories;
+create policy "public can view categories" on public.categories for select using (true);
+create policy "admins manage categories" on public.categories for all to authenticated using (true) with check (true);
 
 drop policy if exists "public can view maps" on public.maps;
 drop policy if exists "admins manage maps" on public.maps;
@@ -65,6 +82,7 @@ create policy "public can view map scores" on public.map_scores for select using
 create policy "admins manage map scores" on public.map_scores for all to authenticated using (true) with check (true);
 
 alter publication supabase_realtime add table public.tournaments;
+alter publication supabase_realtime add table public.categories;
 alter publication supabase_realtime add table public.maps;
 alter publication supabase_realtime add table public.map_scores;
 
