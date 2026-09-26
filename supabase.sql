@@ -119,10 +119,10 @@ begin
   end if;
 end $$;
 
--- โลโก้ทีม: PNG/JPG/JPEG ขนาดสูงสุด 2 MB
+-- โลโก้ทีม: PNG/JPG/JPEG ขนาดสูงสุด 5 MB
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('team-logos', 'team-logos', true, 2097152, array['image/png', 'image/jpeg'])
-on conflict (id) do update set public = true, file_size_limit = 2097152, allowed_mime_types = array['image/png', 'image/jpeg'];
+values ('team-logos', 'team-logos', true, 5242880, array['image/png', 'image/jpeg'])
+on conflict (id) do update set public = true, file_size_limit = 5242880, allowed_mime_types = array['image/png', 'image/jpeg'];
 
 drop policy if exists "public logo access" on storage.objects;
 drop policy if exists "admin upload logos" on storage.objects;
