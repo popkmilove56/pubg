@@ -1,4 +1,4 @@
-const SUPABASE_URL='https://dfjffbzbmkitmnsiifib.supabase.co',KEY='sb_publishable_ntEqcHgqsbxQbg_18j_ztg_IdYZcyfu',db=window.supabase?.createClient(SUPABASE_URL,KEY),app=document.querySelector('#app'),bucket='team-logos',OVERLAY_TEAM_LIMIT=16;
+const SUPABASE_URL='https://dfjffbzbmkitmnsiifib.supabase.co',KEY='sb_publishable_ntEqcHgqsbxQbg_18j_ztg_IdYZcyfu',db=window.supabase?.createClient(SUPABASE_URL,KEY),app=document.querySelector('#app'),bucket='team-logos',OVERLAY_TEAM_LIMIT=18;
 let teams=[],tournaments=[],categories=[],tournament=null,maps=[],scores=[],draft={},user=null,oldPos=new Map(),oldRanks=new Map(),uploadId=null;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const rank=a=>[...a].sort((x,y)=>y.points-x.points||y.kills-x.kills||x.name.localeCompare(y.name));
