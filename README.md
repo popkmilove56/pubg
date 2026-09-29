@@ -20,4 +20,12 @@ https://ชื่อโปรเจกต์.vercel.app/overlay
 
 ## อัปเดตฐานข้อมูล
 
-หลังอัปเดตโค้ด ให้รัน `supabase.sql` ใน Supabase Dashboard > SQL Editor เพื่อเพิ่มคอลัมน์ adjustments สำหรับแก้ PTS และ KILLS ใน LIVE STANDINGS (จำเป็นสำหรับฐานข้อมูลที่สร้างไว้ก่อนหน้านี้)
+หลังอัปเดตโค้ด ให้รัน `supabase.sql` ใน Supabase Dashboard > SQL Editor เพื่อเพิ่มคอลัมน์ Observer และ score adjustments (จำเป็นสำหรับฐานข้อมูลที่สร้างไว้ก่อนหน้านี้)
+
+## Observer Export
+
+1. เปิด **Teams** แล้วเลือก `Teaminfo.csv` และโฟลเดอร์ `TeamIcon` จากชุดไฟล์ Observer จากนั้นกด **IMPORT TEAM LIBRARY** เพื่อบันทึกชื่อทีม ชื่อย่อ สี และโลโก้ไว้ใช้ซ้ำ
+2. เปิด Tournament แล้วไปที่ **OBSERVER** เลือกทีมและกำหนด `TeamNumber` สำหรับรายการนั้น เลขจะเริ่มใหม่ทุก Tournament
+3. ตรวจ CSV preview แล้วดาวน์โหลด `observer.csv` หรือ ZIP ที่รวม `observer.csv` กับไฟล์โลโก้ตาม `ImageFileName`
+
+CSV ใช้คอลัมน์ `TeamNumber,TeamName,TeamShortName,ImageFileName,TeamColor` และคงค่า TeamColor แบบ Hex 8 ตัวตามไฟล์ต้นฉบับ

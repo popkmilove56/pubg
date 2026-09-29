@@ -3,6 +3,9 @@ create table if not exists public.teams (
   id uuid primary key default gen_random_uuid(),
   name text not null check (char_length(name) between 1 and 32),
   logo text not null default '',
+  short_name text not null default '',
+  team_color text not null default 'ffffffff',
+  image_file_name text not null default '',
   score integer not null default 0 check (score >= 0),
   kills integer not null default 0 check (kills >= 0),
   active boolean not null default true,
@@ -12,6 +15,9 @@ create table if not exists public.teams (
 -- Safe for projects that created the teams table before KILLS was added.
 alter table public.teams add column if not exists kills integer not null default 0 check (kills >= 0);
 alter table public.teams add column if not exists active boolean not null default true;
+alter table public.teams add column if not exists short_name text not null default '';
+alter table public.teams add column if not exists team_color text not null default 'ffffffff';
+alter table public.teams add column if not exists image_file_name text not null default '';
 
 -- A tournament has one live map at a time. Live and completed maps contribute to standings.
 create table if not exists public.tournaments (
@@ -22,6 +28,7 @@ create table if not exists public.tournaments (
   team_slots jsonb not null default '[]'::jsonb,
   points_adjustments jsonb not null default '{}'::jsonb,
   kills_adjustments jsonb not null default '{}'::jsonb,
+  observer_numbers jsonb not null default '{}'::jsonb,
   total_maps integer not null check (total_maps between 1 and 20),
   current_map integer not null default 1,
   status text not null default 'active' check (status in ('active','complete','archived')),
@@ -33,6 +40,7 @@ alter table public.tournaments add column if not exists team_ids uuid[] not null
 alter table public.tournaments add column if not exists team_slots jsonb not null default '[]'::jsonb;
 alter table public.tournaments add column if not exists points_adjustments jsonb not null default '{}'::jsonb;
 alter table public.tournaments add column if not exists kills_adjustments jsonb not null default '{}'::jsonb;
+alter table public.tournaments add column if not exists observer_numbers jsonb not null default '{}'::jsonb;
 alter table public.tournaments drop constraint if exists tournaments_status_check;
 alter table public.tournaments add constraint tournaments_status_check check (status in ('active','complete','archived'));
 
