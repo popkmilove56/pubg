@@ -17,3 +17,7 @@ https://ชื่อโปรเจกต์.vercel.app/overlay
 หน้าให้ทีมงานดูคะแนน: `https://ชื่อโปรเจกต์.vercel.app/live`
 
 ข้อมูลจะบันทึกใน Supabase และทุกหน้าจะอัปเดตผ่าน Supabase Realtime
+
+## อัปเดตฐานข้อมูล
+
+หลังอัปเดตโค้ด ให้รัน `supabase.sql` ใน Supabase Dashboard > SQL Editor เพื่อเพิ่มคอลัมน์ adjustment สำหรับแก้ TOTAL ใน LIVE STANDINGS (จำเป็นสำหรับฐานข้อมูลที่สร้างไว้ก่อนหน้านี้)
