@@ -1,6 +1,6 @@
 .live-standings-panel .score-head,
 .live-standings-panel .score-row {
-  grid-template-columns: 38px minmax(0, 1fr) 72px 45px;
+  grid-template-columns: 38px minmax(0, 1fr) 68px 65px;
 }
 
 .total-edit-trigger {
@@ -37,7 +37,7 @@
 }
 
 .total-edit-form input {
-  width: 38px;
+  width: 32px;
   min-width: 0;
   height: 30px;
   padding: 2px;
@@ -49,7 +49,7 @@
 }
 
 .total-edit-form button {
-  width: 16px;
+  width: 14px;
   height: 28px;
   padding: 0;
   border: 0;
@@ -63,17 +63,25 @@
   color: #aab4ac;
 }
 
-.score-adjustment {
-  grid-column: 3 / 5;
+.score-adjustment-points,
+.score-adjustment-kills {
   margin-top: -8px;
   color: #99e7b4;
   font: 700 9px Inter, sans-serif;
   text-align: right;
 }
 
+.score-adjustment-points {
+  grid-column: 3 / 4;
+}
+
+.score-adjustment-kills {
+  grid-column: 4 / 5;
+}
+
 @media (max-width: 980px) {
   .live-standings-panel .score-head,
   .live-standings-panel .score-row {
-    grid-template-columns: 42px minmax(0, 1fr) 78px 58px;
+    grid-template-columns: 42px minmax(0, 1fr) 72px 68px;
   }
 }

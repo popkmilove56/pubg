@@ -21,6 +21,7 @@ create table if not exists public.tournaments (
   team_ids uuid[] not null default '{}',
   team_slots jsonb not null default '[]'::jsonb,
   points_adjustments jsonb not null default '{}'::jsonb,
+  kills_adjustments jsonb not null default '{}'::jsonb,
   total_maps integer not null check (total_maps between 1 and 20),
   current_map integer not null default 1,
   status text not null default 'active' check (status in ('active','complete','archived')),
@@ -31,6 +32,7 @@ alter table public.tournaments add column if not exists category text not null d
 alter table public.tournaments add column if not exists team_ids uuid[] not null default '{}';
 alter table public.tournaments add column if not exists team_slots jsonb not null default '[]'::jsonb;
 alter table public.tournaments add column if not exists points_adjustments jsonb not null default '{}'::jsonb;
+alter table public.tournaments add column if not exists kills_adjustments jsonb not null default '{}'::jsonb;
 alter table public.tournaments drop constraint if exists tournaments_status_check;
 alter table public.tournaments add constraint tournaments_status_check check (status in ('active','complete','archived'));
 

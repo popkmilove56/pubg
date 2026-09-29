@@ -20,4 +20,4 @@ https://ชื่อโปรเจกต์.vercel.app/overlay
 
 ## อัปเดตฐานข้อมูล
 
-หลังอัปเดตโค้ด ให้รัน `supabase.sql` ใน Supabase Dashboard > SQL Editor เพื่อเพิ่มคอลัมน์ adjustment สำหรับแก้ TOTAL ใน LIVE STANDINGS (จำเป็นสำหรับฐานข้อมูลที่สร้างไว้ก่อนหน้านี้)
+หลังอัปเดตโค้ด ให้รัน `supabase.sql` ใน Supabase Dashboard > SQL Editor เพื่อเพิ่มคอลัมน์ adjustments สำหรับแก้ PTS และ KILLS ใน LIVE STANDINGS (จำเป็นสำหรับฐานข้อมูลที่สร้างไว้ก่อนหน้านี้)
