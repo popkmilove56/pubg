@@ -554,6 +554,16 @@
 }
 
 @media (max-width: 700px) {
+  .hero .heroArt {
+    clip-path: none;
+    height: auto;
+    inset: 0;
+    bottom: var(--mobile-hero-video-bottom, 180px);
+    left: 0;
+    right: 0;
+    width: auto;
+  }
+
   .heroInner {
     align-items: start;
     gap: 18px;

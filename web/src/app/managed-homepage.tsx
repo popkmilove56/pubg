@@ -304,6 +304,40 @@ export function ManagedUpcomingEvents() {
   const data = useHomepage();
   const [selectedEvent, setSelectedEvent] = useState<EventCard | null>(null);
   const events = data.content.upcomingEvents.filter((event) => event.title?.trim());
+
+  useEffect(() => {
+    const hero = document.querySelector<HTMLElement>(".hero");
+    const eventGrid = hero?.querySelector<HTMLElement>(".eventGrid");
+    if (!hero || !eventGrid) return;
+
+    const updateBackgroundEnd = () => {
+      if (!window.matchMedia("(max-width: 700px)").matches) {
+        hero.style.removeProperty("--mobile-hero-video-bottom");
+        return;
+      }
+
+      const firstCard = eventGrid.querySelector<HTMLElement>(".eventCard");
+      if (!firstCard) return;
+
+      const heroBounds = hero.getBoundingClientRect();
+      const cardBounds = firstCard.getBoundingClientRect();
+      const cardMidpoint = cardBounds.top + cardBounds.height / 2;
+      hero.style.setProperty("--mobile-hero-video-bottom", `${Math.max(0, heroBounds.bottom - cardMidpoint)}px`);
+    };
+
+    const observer = new ResizeObserver(updateBackgroundEnd);
+    observer.observe(hero);
+    observer.observe(eventGrid);
+    window.addEventListener("resize", updateBackgroundEnd);
+    updateBackgroundEnd();
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateBackgroundEnd);
+      hero.style.removeProperty("--mobile-hero-video-bottom");
+    };
+  }, [data.content.upcomingEvents]);
+
   return <div className="container upcomingBlock">
     <div className="miniHeading"><b>UPCOMING EVENTS</b><a href="#tournaments">All events →</a></div>
     {statusMessage(data)}
