@@ -1,6 +1,9 @@
 /node_modules
 /.next
 /out
+/public/admin/
+/public/admin-assets/*
+!/public/admin-assets/main-site-theme.css
 /.env.local
 *.tsbuildinfo
 npm-debug.log*

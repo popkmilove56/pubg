@@ -7,3 +7,6 @@ scores.json
 # Dependencies and logs
 node_modules/
 *.log
+
+.vercel
+.env.local

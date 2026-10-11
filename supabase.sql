@@ -140,3 +140,39 @@ drop policy if exists "public logo access" on storage.objects;
 drop policy if exists "admin upload logos" on storage.objects;
 create policy "public logo access" on storage.objects for select using (bucket_id = 'team-logos');
 create policy "admin upload logos" on storage.objects for insert to authenticated with check (bucket_id = 'team-logos');
+
+-- Public homepage content managed from /website in the tournament manager.
+create table if not exists public.site_content (
+  key text primary key check (key = 'homepage'),
+  content jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.site_content enable row level security;
+
+drop policy if exists "public can view site content" on public.site_content;
+drop policy if exists "admins manage site content" on public.site_content;
+create policy "public can view site content" on public.site_content
+for select using (true);
+
+create policy "admins manage site content" on public.site_content
+for all to authenticated using (true) with check (true);
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('site-media', 'site-media', true, 20971520, array['image/jpeg', 'image/png', 'image/webp'])
+on conflict (id) do update set
+  public = true,
+  file_size_limit = 20971520,
+  allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp'];
+
+drop policy if exists "public homepage media access" on storage.objects;
+drop policy if exists "admins upload homepage media" on storage.objects;
+create policy "public homepage media access" on storage.objects
+for select using (bucket_id = 'site-media');
+
+create policy "admins upload homepage media" on storage.objects
+for insert to authenticated
+with check (
+  bucket_id = 'site-media'
+  and (storage.foldername(name))[1] = (select auth.uid()::text)
+);

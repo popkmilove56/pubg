@@ -1,0 +1,276 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Unbounded:wght@300;500;700;800&display=swap");
+
+:root {
+  --green: #10f957;
+  --bright: #10f957;
+  --ink: #111211;
+  --surface: #1b1c1b;
+  --surface2: #202120;
+  --line: #343634;
+  --text: #f3f3ef;
+  --muted: #969996;
+  --font-display: "Unbounded", "Arial Black", sans-serif;
+  --font-body: "Barlow", Arial, sans-serif;
+}
+
+body {
+  background: #111211;
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+.shell {
+  max-width: 1110px;
+}
+
+h1,
+h2,
+.rank,
+.display-score,
+.display-kills,
+.map-total,
+.overall-total {
+  font-family: var(--font-display);
+}
+
+h1 {
+  font-size: clamp(25px, 3vw, 34px);
+  letter-spacing: -0.055em;
+  line-height: 1.15;
+}
+
+h2 {
+  font-size: clamp(19px, 2vw, 25px);
+  letter-spacing: -0.045em;
+}
+
+small,
+.topbar small,
+.command-strip,
+.table-head,
+.score-head {
+  letter-spacing: 0.08em;
+}
+
+.topbar {
+  align-items: center;
+  gap: 20px;
+}
+
+.topbar > div > small {
+  color: var(--bright);
+  font-size: 9px;
+}
+
+.topbar p,
+.shell p {
+  color: #a5a8a5;
+}
+
+button,
+.nav a,
+.card-actions a,
+input,
+select {
+  border-radius: 0;
+  font-family: var(--font-body);
+}
+
+button,
+.nav a,
+.card-actions a {
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+button:hover,
+.nav a:hover {
+  border-color: var(--bright);
+  background: #242624;
+}
+
+button.primary,
+.card-actions .primary {
+  border-color: var(--bright);
+  background: var(--bright);
+  color: #08100a;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px #050505;
+}
+
+button.primary:hover,
+.card-actions .primary:hover {
+  background: #42ff78;
+  border-color: #42ff78;
+  transform: translateY(1px);
+}
+
+.nav a {
+  min-height: 36px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+}
+
+.nav .is-active {
+  border-color: var(--bright);
+  background: #17301f;
+  color: var(--bright);
+}
+
+.command-strip {
+  border-color: #285b37;
+  background: #151c16;
+}
+
+.live-dot {
+  box-shadow: 0 0 12px rgb(16 249 87 / 45%);
+}
+
+.tournament-card,
+.setup-panel,
+.team-library-add,
+.observer-import,
+.team-library-row,
+.history-map,
+.live-standings-panel,
+.map-entry,
+.totals,
+.entry-row,
+.empty {
+  border-color: var(--line);
+  background-color: var(--surface);
+}
+
+.tournament-card,
+.history-map {
+  border-bottom: 4px solid #050505;
+}
+
+.tournament-card:hover,
+.team-library-row:hover,
+.admin-row:hover {
+  border-color: #458b59;
+}
+
+.tournament-card h2 {
+  font-family: var(--font-display);
+  font-size: clamp(17px, 2vw, 23px);
+}
+
+.card-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.card-actions a,
+.card-actions button {
+  min-width: 0;
+  padding: 0 6px;
+  white-space: nowrap;
+  font-size: 9px;
+}
+
+.team-library-row,
+.admin-row,
+.score-row,
+.entry-row {
+  background: linear-gradient(100deg, #1b1c1b, #151615);
+}
+
+.team-library-row:nth-child(even),
+.score-row:nth-child(even) {
+  background: linear-gradient(100deg, #202120, #191a19);
+}
+
+.logo {
+  background: transparent;
+}
+
+.placeholder {
+  background: #202a22;
+  font-family: var(--font-display);
+}
+
+input,
+select {
+  border-color: var(--line);
+  background: #111211;
+  color: var(--text);
+}
+
+input:focus,
+select:focus {
+  outline-color: var(--bright);
+  border-color: var(--bright);
+}
+
+.score-head {
+  background: var(--bright);
+  color: #08100a;
+}
+
+.score-row,
+.admin-row,
+.entry-row {
+  border-color: #303230;
+}
+
+.rank {
+  font-variant-numeric: tabular-nums;
+}
+
+.metric,
+.metric button {
+  background: #111211;
+}
+
+.metric button:hover {
+  background: #233226;
+}
+
+.fixed-badge {
+  border-color: #376443;
+  background: #17251a;
+  color: #a9f6bd;
+}
+
+.category-list span {
+  background: var(--surface);
+}
+
+@media (max-width: 760px) {
+  .shell {
+    width: calc(100% - 28px);
+    padding-top: 26px;
+  }
+
+  .topbar {
+    align-items: stretch;
+    overflow-x: clip;
+  }
+
+  .topbar .nav {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .top-actions {
+    min-width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

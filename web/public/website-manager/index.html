@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#111211" />
+    <title>Website Content | PUBG Tournament Manager</title>
+    <link rel="stylesheet" href="/website-manager/styles.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script defer src="/website-manager/app.js"></script>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="page-header">
+        <div>
+          <a class="back-link" href="/admin">← TOURNAMENT MANAGER</a>
+          <p class="eyebrow">PUBLIC HOMEPAGE · CONTENT CONTROL</p>
+          <h1>Website Content</h1>
+          <p class="intro">จัดการข้อมูลหน้าเว็บ และเลือก Tournament เดิมมาแสดงผลได้ โดยไม่แก้ไขข้อมูลการแข่งขัน</p>
+        </div>
+        <div id="session-area" class="session-area" aria-live="polite"></div>
+      </header>
+
+      <div id="notice" class="notice" role="status" hidden></div>
+      <div id="app"><div class="loading">กำลังโหลดข้อมูล…</div></div>
+    </main>
+  </body>
+</html>
