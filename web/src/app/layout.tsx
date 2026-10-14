@@ -6,24 +6,30 @@ import "@fontsource/unbounded/800.css";
 import "@fontsource/barlow/400.css";
 import "@fontsource/barlow/500.css";
 import "@fontsource/barlow/600.css";
+import "@fontsource/noto-sans-thai/400.css";
+import "@fontsource/noto-sans-thai/500.css";
+import "@fontsource/noto-sans-thai/600.css";
+import "@fontsource/noto-sans-thai/700.css";
+import "@fontsource/noto-sans-thai/800.css";
 import "./globals.css";
+import "./typography.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.gbgbattleground.online"),
-  title: "GBG Battlegrounds | แข่งขัน PUBG และคะแนนสด",
+  title: "GBG Battlegrounds | PUBG Tournaments & Live Scores",
   description:
-    "ติดตามการแข่งขัน PUBG ตารางแข่ง ถ่ายทอดสด คะแนนสด และผลการแข่งขันจาก GBG Battlegrounds",
+    "Join GBG Battlegrounds PUBG tournaments, check event schedules, follow live scores, and view final standings.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
-    locale: "th_TH",
+    locale: "en_US",
     url: "/",
     siteName: "GBG Battlegrounds",
-    title: "GBG Battlegrounds | แข่งขัน PUBG และคะแนนสด",
+    title: "GBG Battlegrounds | PUBG Tournaments & Live Scores",
     description:
-      "ติดตามการแข่งขัน PUBG ตารางแข่ง ถ่ายทอดสด คะแนนสด และผลการแข่งขันจาก GBG Battlegrounds",
+      "Join GBG Battlegrounds PUBG tournaments, check event schedules, follow live scores, and view final standings.",
     images: [
       {
         url: "/media/gbg-battlegrounds-logo.png",
@@ -33,9 +39,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "GBG Battlegrounds | แข่งขัน PUBG และคะแนนสด",
+    title: "GBG Battlegrounds | PUBG Tournaments & Live Scores",
     description:
-      "ติดตามการแข่งขัน PUBG ตารางแข่ง ถ่ายทอดสด คะแนนสด และผลการแข่งขันจาก GBG Battlegrounds",
+      "Join GBG Battlegrounds PUBG tournaments, check event schedules, follow live scores, and view final standings.",
     images: ["/media/gbg-battlegrounds-logo.png"],
   },
   icons: {
@@ -54,7 +60,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="th" data-scroll-behavior="smooth">
+    <html lang="en" data-scroll-behavior="smooth">
       <body>{children}</body>
     </html>
   );
