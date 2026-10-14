@@ -9,8 +9,47 @@ import "@fontsource/barlow/600.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "PUBG Tournaments",
-  description: "PUBG tournament schedules, live scores and final standings.",
+  metadataBase: new URL("https://www.gbgbattleground.online"),
+  title: "GBG Battlegrounds | แข่งขัน PUBG และคะแนนสด",
+  description:
+    "ติดตามการแข่งขัน PUBG ตารางแข่ง ถ่ายทอดสด คะแนนสด และผลการแข่งขันจาก GBG Battlegrounds",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "th_TH",
+    url: "/",
+    siteName: "GBG Battlegrounds",
+    title: "GBG Battlegrounds | แข่งขัน PUBG และคะแนนสด",
+    description:
+      "ติดตามการแข่งขัน PUBG ตารางแข่ง ถ่ายทอดสด คะแนนสด และผลการแข่งขันจาก GBG Battlegrounds",
+    images: [
+      {
+        url: "/media/gbg-battlegrounds-logo.png",
+        alt: "GBG Battlegrounds",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GBG Battlegrounds | แข่งขัน PUBG และคะแนนสด",
+    description:
+      "ติดตามการแข่งขัน PUBG ตารางแข่ง ถ่ายทอดสด คะแนนสด และผลการแข่งขันจาก GBG Battlegrounds",
+    images: ["/media/gbg-battlegrounds-logo.png"],
+  },
+  icons: {
+    icon: "/icon.png",
+    apple: "/apple-icon.png",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

@@ -16,7 +16,7 @@ const links = [
 ];
 
 function BrandMark() {
-  return <Image className="brandMark" src="/media/gbg-battlegrounds-wordmark.png" alt="GBG Battlegrounds" width={64} height={64} priority />;
+  return <Image className="brandMark" src="/media/gbg-battlegrounds-logo.png" alt="GBG Battlegrounds" width={64} height={64} priority />;
 }
 
 export function SiteNav() {

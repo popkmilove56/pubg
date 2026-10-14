@@ -83,22 +83,13 @@ type MapScore = {
 type Standing = Team & { points: number; kills: number };
 
 const defaults: HomepageContent = {
-  upcomingEvents: [
-    { badge: "OPEN", date: "Sat 18:30", registrationStatus: "open", title: "1ST GREEN TOURNAMENT", note: "32 teams · 3,700 THB prize pool", details: "", imageUrl: "", tone: "green", action: "JOIN ON DISCORD", href: "https://discord.gg/rrJvHZfkw" },
-    { badge: "WEEKLY", date: "Fri 20:00", registrationStatus: "open", title: "POINTS SCRIM", note: "Entry [price]", details: "", imageUrl: "", tone: "pink", action: "JOIN ON DISCORD", href: "https://discord.gg/rrJvHZfkw" },
-    { badge: "SOON", date: "[Date]", registrationStatus: "open", title: "SEASON FINALE", note: "Details to be announced", details: "", imageUrl: "", tone: "purple", action: "NOTIFY ME", href: "https://discord.gg/rrJvHZfkw" },
-  ],
-  live: { isOnAir: false, streamLabel: "Streamed on Facebook Live", matchTitle: "FINAL · MATCH 2 OF 3", description: "The real Facebook or YouTube stream is embedded here.", streamUrl: "https://www.facebook.com/Phetvaravut?locale=th_TH", replayUrl: "", tournamentId: "" },
+  upcomingEvents: [],
+  live: { isOnAir: false, streamLabel: "ถ่ายทอดสดการแข่งขัน", matchTitle: "", description: "ติดตามประกาศการถ่ายทอดสดและผลการแข่งขันได้ที่นี่", streamUrl: "", replayUrl: "", tournamentId: "" },
   pastTournamentIds: [],
   pastTournamentMedia: {},
   featuredTournamentId: "",
   workTitle: "WORK & UPDATES",
-  workUpdates: [
-    { title: "GRAPHICS", summary: "Posters, leaderboards and stream overlays", detail: "Updates for graphics will appear here.", imageUrl: "" },
-    { title: "TEAM UPDATES", summary: "Rosters, results and announcements", detail: "Updates for team updates will appear here.", imageUrl: "" },
-    { title: "BEHIND THE SCENES", summary: "How each event is built and run", detail: "Updates from behind the scenes will appear here.", imageUrl: "" },
-    { title: "SITE & TOOLS", summary: "The pages and tools behind the events", detail: "Updates about the site and tools will appear here.", imageUrl: "" },
-  ],
+  workUpdates: [],
 };
 
 type HomepageData = {
@@ -131,7 +122,7 @@ function normalizeContent(value: Partial<HomepageContent> | null | undefined): H
     live: { ...defaults.live, ...value?.live },
     upcomingEvents: Array.isArray(value?.upcomingEvents)
       ? value.upcomingEvents.map((event, index) => ({
-        ...defaults.upcomingEvents[index % defaults.upcomingEvents.length],
+        ...defaults.upcomingEvents[index],
         ...event,
         registrationStatus: event.registrationStatus === "ended" ? "ended" : "open",
         details: event.details || "",
@@ -353,7 +344,7 @@ export function ManagedUpcomingEvents() {
           <div className="eventBody"><h3>{event.title}</h3><p>{event.note}</p><span className="cardOpenHint">VIEW DETAILS ↗</span></div>
         </article>;
       })}</div>
-      : <p className="managedStatus">No upcoming events have been published yet.</p>}
+      : <p className="managedStatus">ยังไม่มีประกาศการแข่งขันรายการถัดไป</p>}
     {selectedEvent && <CardPopup title={selectedEvent.title} imageUrl={selectedEvent.imageUrl} onClose={() => setSelectedEvent(null)}>
       <p className="cardPopupMeta">{selectedEvent.badge} · {selectedEvent.date}</p>
       <p>{selectedEvent.note}</p>
@@ -385,7 +376,7 @@ export function ManagedLiveSection() {
         <div className="buttonRow">{streamUrl && <a className="button" href={streamUrl} target="_blank" rel="noreferrer">WATCH STREAM</a>}{replayUrl && <a className="button buttonDark" href={replayUrl} target="_blank" rel="noreferrer">REPLAY</a>}</div>
       </div>
       <div className="scoreBoard"><small>{tournament ? `${tournament.name} · LIVE SCORES` : "LIVE SCORES"}</small>
-        {liveScores.length ? liveScores.map((team, index) => <div className="scoreRow" key={team.id}><b>{index + 1}</b><TeamLogo team={team} className="liveScoreLogo" /><strong>{team.name}</strong><span>—</span><em>{team.points}</em></div>) : <p className="managedStatus">{live.tournamentId ? "No scores recorded for this Tournament yet." : "Choose a live Tournament in Website Content to show its scores."}</p>}
+        {liveScores.length ? liveScores.map((team, index) => <div className="scoreRow" key={team.id}><b>{index + 1}</b><TeamLogo team={team} className="liveScoreLogo" /><strong>{team.name}</strong><span>—</span><em>{team.points}</em></div>) : <p className="managedStatus">        {live.tournamentId ? "ยังไม่มีคะแนนที่บันทึกไว้สำหรับรายการนี้" : "ติดตามประกาศรายการถ่ายทอดสดและคะแนนการแข่งขัน"}</p>}
       </div>
     </div>
   </div></section>;
@@ -453,7 +444,7 @@ export function ManagedWorkUpdates() {
   const data = useHomepage();
   const [active, setActive] = useState<number | null>(0);
   return <div className="work" id="work">
-    <div className="workTitle"><h2>{data.content.workTitle || "WORK & UPDATES"}</h2><span>Hover a row to see the latest.</span></div>
+    <div className="workTitle"><h2>{data.content.workTitle || "WORK & UPDATES"}</h2><span>ติดตามข่าวสารและอัปเดตจาก GBG Battlegrounds</span></div>
     {statusMessage(data)}
     {data.content.workUpdates.map((item, index) => {
       const isOpen = active === index;
@@ -469,5 +460,6 @@ export function ManagedWorkUpdates() {
         </div>
       </div>;
     })}
+    {!data.content.workUpdates.length && <p className="managedStatus">ยังไม่มีข่าวสารอัปเดต</p>}
   </div>;
 }
