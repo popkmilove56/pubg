@@ -18,7 +18,7 @@ https://ชื่อโปรเจกต์.vercel.app/overlay
 
 ข้อมูลจะบันทึกใน Supabase และทุกหน้าจะอัปเดตผ่าน Supabase Realtime
 
-จัดการเนื้อหาหน้าเว็บสาธารณะได้ที่ `https://ชื่อโปรเจกต์.vercel.app/website` หลังเข้าสู่ระบบแอดมิน ระบบนี้ใช้ตาราง `site_content` และ bucket `site-media` สำหรับอัปโหลดภาพการ์ดและ Homepage Updates (JPG/PNG/WEBP ไม่เกิน 20 MB) พร้อม crop ภาพก่อนอัปโหลด ซึ่งสร้างได้โดยรัน `supabase.sql` ใน Supabase Dashboard > SQL Editor ภาพ Homepage Updates จะแสดงด้านซ้ายของรายละเอียดเมื่อเปิดรายการ จากนั้นเลือก Tournament ที่เสร็จแล้วเพื่อแสดงใน Past Tournaments และ Final Standings การ์ด Upcoming Events และ Past Tournaments เปิด popup รายละเอียดเมื่อกด ในส่วน Live รองรับการฝัง Facebook Live/วิดีโอสาธารณะและ YouTube Live โดยวาง URL วิดีโอในช่อง STREAM URL
+จัดการเนื้อหาหน้าเว็บสาธารณะได้ที่ `https://ชื่อโปรเจกต์.vercel.app/website` หลังเข้าสู่ระบบแอดมิน ระบบนี้ใช้ตาราง `site_content` และ bucket `site-media` สำหรับอัปโหลดภาพการ์ดและ Homepage Updates (JPG/PNG/WEBP ไม่เกิน 20 MB) พร้อม crop ภาพก่อนอัปโหลด ซึ่งสร้างได้โดยรัน `supabase.sql` ใน Supabase Dashboard > SQL Editor ภาพ Homepage Updates จะแสดงด้านซ้ายของรายละเอียดเมื่อเปิดรายการ จากนั้นเลือก Tournament เดิมเพื่อแสดงใน Past Tournaments โดยใช้ปุ่มลูกศรจัดลำดับการ์ดได้โดยไม่แก้ข้อมูลการแข่งขัน หน้าเว็บแสดง Past Tournaments 6 การ์ดแรกและมีปุ่มแสดงเพิ่มเติม การ์ด Upcoming Events และ Past Tournaments เปิด popup รายละเอียดเมื่อกด ในส่วน Live รองรับการฝัง Facebook Live/วิดีโอสาธารณะและ YouTube Live โดยวาง URL วิดีโอในช่อง STREAM URL
 
 ## อัปเดตฐานข้อมูล
 

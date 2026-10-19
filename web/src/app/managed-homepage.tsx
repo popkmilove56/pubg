@@ -385,30 +385,37 @@ export function ManagedLiveSection() {
 export function ManagedPastTournaments() {
   const data = useHomepage();
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
+  const [showAll, setShowAll] = useState(false);
   const selected = data.content.pastTournamentIds
     .map((id) => data.tournaments.find((item) => item.id === id))
     .filter((tournament): tournament is Tournament => Boolean(tournament));
+  const visibleTournaments = showAll ? selected : selected.slice(0, 6);
 
   return <section className="pastSection" id="tournaments"><div className="container">
     <div className="sectionHeading darkText"><h2>PAST TOURNAMENTS</h2><a href="#standings">View standings</a></div>
     {statusMessage(data)}
     {selected.length
-      ? <div className="pastGrid">{selected.map((tournament, index) => {
-        const results = standingsFor(tournament, data);
-        const winner = results[0];
-        const tone = ["paper", "purple", "blue"][index % 3];
-        const date = tournament.created_at ? new Date(tournament.created_at).toLocaleDateString("en-GB") : "";
-        const media = data.content.pastTournamentMedia[tournament.id];
-        return <article className={`pastCard ${tone} ${media?.imageUrl ? "hasCardImage" : ""}`} key={tournament.id} role="button" tabIndex={0} aria-haspopup="dialog" onClick={() => setSelectedTournament(tournament)} onKeyDown={(keyEvent) => {
-          if (keyEvent.key === "Enter" || keyEvent.key === " ") {
-            keyEvent.preventDefault();
-            setSelectedTournament(tournament);
-          }
-        }}>
-          <div className="pastTop">{media?.imageUrl && <img className="cardCoverImage" src={media.imageUrl} alt="" />}<small>{tournament.status === "complete" ? "FINAL · COMPLETED" : tournament.status.toUpperCase()}</small><strong>{date}</strong><span>{tournament.category || "Tournament"} · {results.length} teams</span></div>
-          <div className="pastBottom"><h3>{tournament.name}</h3><p>{winner ? <>Winner: <strong className="pastWinnerName">{winner.name}</strong> · <em className="pastWinnerPoints">{winner.points} PTS</em></> : "Final results are not available yet."}<br /><span className="cardOpenHint">VIEW DETAILS ↗</span></p></div>
-        </article>;
-      })}</div>
+      ? <>
+        <div className="pastGrid">{visibleTournaments.map((tournament, index) => {
+          const results = standingsFor(tournament, data);
+          const winner = results[0];
+          const tone = ["paper", "purple", "blue"][index % 3];
+          const date = tournament.created_at ? new Date(tournament.created_at).toLocaleDateString("en-GB") : "";
+          const media = data.content.pastTournamentMedia[tournament.id];
+          return <article className={`pastCard ${tone} ${media?.imageUrl ? "hasCardImage" : ""}`} key={tournament.id} role="button" tabIndex={0} aria-haspopup="dialog" onClick={() => setSelectedTournament(tournament)} onKeyDown={(keyEvent) => {
+            if (keyEvent.key === "Enter" || keyEvent.key === " ") {
+              keyEvent.preventDefault();
+              setSelectedTournament(tournament);
+            }
+          }}>
+            <div className="pastTop">{media?.imageUrl && <img className="cardCoverImage" src={media.imageUrl} alt="" />}<small>{tournament.status === "complete" ? "FINAL · COMPLETED" : tournament.status.toUpperCase()}</small><strong>{date}</strong><span>{tournament.category || "Tournament"} · {results.length} teams</span></div>
+            <div className="pastBottom"><h3>{tournament.name}</h3><p>{winner ? <>Winner: <strong className="pastWinnerName">{winner.name}</strong> · <em className="pastWinnerPoints">{winner.points} PTS</em></> : "Final results are not available yet."}<br /><span className="cardOpenHint">VIEW DETAILS ↗</span></p></div>
+          </article>;
+        })}</div>
+        {selected.length > 6 && <button className="button buttonDark pastShowMore" type="button" onClick={() => setShowAll((current) => !current)} aria-expanded={showAll}>
+          {showAll ? "Show fewer tournaments" : `Show ${selected.length - 6} more tournaments`}
+        </button>}
+      </>
       : <p className="managedStatus">Select completed Tournaments in Website Content to publish past results.</p>}
     {selectedTournament && (() => {
       const results = standingsFor(selectedTournament, data);

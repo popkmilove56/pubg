@@ -54,6 +54,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--green); box-shad
 .event-list, .work-list { display: grid; gap: 10px; }
 .event-editor, .work-editor { position: relative; gap: 11px; padding: 14px; border: 1px solid var(--line); background: #151715; }
 .event-editor-head, .work-editor-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .08em; }
+.event-editor-head .button-group { flex: 0 0 auto; }
+.event-editor-head .button { min-width: 36px; padding: 0 9px; }
+.event-editor-head .button:disabled { cursor: not-allowed; }
 .image-field { display: grid; gap: 9px; }
 .image-field input[type="file"] { padding: 7px; }
 .image-preview { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
@@ -81,6 +84,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--green); box-shad
 .tournament-option:hover { border-color: #4b8057; }
 .tournament-option span { display: grid; gap: 3px; min-width: 0; font-size: 12px; }
 .tournament-option small { color: var(--muted); font-size: 10px; }
+.past-media-list { display: grid; gap: 10px; margin-top: 18px; }
+.past-media-list > .field-label { margin-bottom: 0; }
 .section-note { margin: 0; color: var(--muted); font-size: 11px; }
 .save-bar { position: sticky; z-index: 5; bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 15px; padding: 12px; border: 1px solid #356644; background: #111b13f2; backdrop-filter: blur(12px); }
 .save-bar span { color: var(--muted); font-size: 11px; }
@@ -94,6 +99,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--green); box-shad
   .panel { padding: 15px; }
   .panel-heading { flex-direction: column; }
   .field-grid, .field-grid.three, .tournament-list { grid-template-columns: 1fr; }
+  .event-editor-head { align-items: flex-start; }
+  .event-editor-head > span { overflow-wrap: anywhere; }
+  .event-editor-head .button-group { gap: 5px; }
+  .event-editor-head .button { min-width: 32px; padding: 0 7px; }
   .save-bar { align-items: stretch; flex-direction: column; }
   .crop-modal { padding: 14px; }
   .crop-stage canvas { max-height: 48vh; }

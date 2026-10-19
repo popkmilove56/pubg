@@ -85,6 +85,11 @@
   padding: 20px 22px 22px;
 }
 
+.pastShowMore {
+  display: flex;
+  margin: 24px auto 0;
+}
+
 .eventGrid .eventBody p {
   color: #9b6bff;
   font-weight: 700;

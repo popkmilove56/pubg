@@ -105,7 +105,10 @@
         replayUrl: values.get("liveReplayUrl") || "",
         tournamentId: values.get("liveTournamentId") || "",
       },
-      pastTournamentIds: values.getAll("pastTournamentIds"),
+      pastTournamentIds: [
+        ...(content.pastTournamentIds || []).filter((id) => values.getAll("pastTournamentIds").includes(id)),
+        ...values.getAll("pastTournamentIds").filter((id) => !(content.pastTournamentIds || []).includes(id)),
+      ],
       pastTournamentMedia: {
         ...(content.pastTournamentMedia || {}),
         ...Object.fromEntries(values.getAll("pastTournamentIds").map((id) => [id, {
@@ -144,7 +147,7 @@
     const pastMedia = content.pastTournamentMedia || {};
     const eventEditors = content.upcomingEvents.map((event, index) => `
       <article class="event-editor">
-        <div class="event-editor-head"><span>EVENT ${String(index + 1).padStart(2, "0")}</span><button class="button danger" type="button" data-remove-event="${index}">REMOVE</button></div>
+        <div class="event-editor-head"><span>EVENT ${String(index + 1).padStart(2, "0")}</span><div class="button-group"><button class="button" type="button" data-move-event="${index}" data-direction="-1" aria-label="Move event ${index + 1} left" ${index === 0 ? "disabled" : ""}>←</button><button class="button" type="button" data-move-event="${index}" data-direction="1" aria-label="Move event ${index + 1} right" ${index === content.upcomingEvents.length - 1 ? "disabled" : ""}>→</button><button class="button danger" type="button" data-remove-event="${index}">REMOVE</button></div></div>
         ${imageField(`eventImageUrl${index}`, event.imageUrl, "CARD IMAGE", "event", String(index))}
         <div class="field-grid">
           <label class="field"><span>BADGE</span><input name="eventBadge${index}" maxlength="20" value="${escapeHtml(event.badge)}" placeholder="OPEN"></label>
@@ -171,16 +174,19 @@
         <label class="field"><span>UPDATE / DETAILS</span><textarea name="workDetail${index}" maxlength="500">${escapeHtml(item.detail)}</textarea></label>
       </article>`).join("");
     const selectableTournaments = tournaments.filter((item) => item.status !== "active").map((item) => tournamentOption(item, selectedPast.has(item.id))).join("");
-    const pastMediaEditors = tournaments.filter((item) => selectedPast.has(item.id)).map((item) => `
+    const orderedPastTournaments = (content.pastTournamentIds || [])
+      .map((id) => tournaments.find((item) => item.id === id))
+      .filter((item) => item && selectedPast.has(item.id));
+    const pastMediaEditors = orderedPastTournaments.map((item, index) => `
       <article class="event-editor past-media-editor">
-        <div class="event-editor-head"><span>${escapeHtml(item.name)}</span></div>
+        <div class="event-editor-head"><span>${String(index + 1).padStart(2, "0")} · ${escapeHtml(item.name)}</span><div class="button-group"><button class="button" type="button" data-move-past="${escapeHtml(item.id)}" data-direction="-1" aria-label="Move ${escapeHtml(item.name)} left" ${index === 0 ? "disabled" : ""}>←</button><button class="button" type="button" data-move-past="${escapeHtml(item.id)}" data-direction="1" aria-label="Move ${escapeHtml(item.name)} right" ${index === orderedPastTournaments.length - 1 ? "disabled" : ""}>→</button></div></div>
         ${imageField(`pastImageUrl-${item.id}`, pastMedia[item.id]?.imageUrl, "CARD IMAGE", "past", item.id)}
         <label class="field"><span>POPUP DETAILS</span><textarea name="pastDetails-${item.id}" maxlength="800" placeholder="Add an event summary or other details…">${escapeHtml(pastMedia[item.id]?.details || "")}</textarea></label>
       </article>`).join("");
 
     app.innerHTML = `<form id="content-form" class="editor-form">
       <section class="panel">
-        <div class="panel-heading"><div><p class="section-kicker">UPCOMING EVENTS</p><h2>Event cards</h2><p>จัดการการ์ดกิจกรรมที่แสดงใน Hero ของหน้าเว็บ</p></div><button class="button" type="button" id="add-event">+ ADD EVENT</button></div>
+        <div class="panel-heading"><div><p class="section-kicker">UPCOMING EVENTS</p><h2>Event cards</h2><p>จัดการการ์ดกิจกรรมและใช้ปุ่มลูกศรเพื่อเรียงลำดับการแสดงผลจากซ้ายไปขวา</p></div><button class="button" type="button" id="add-event">+ ADD EVENT</button></div>
         <div class="event-list">${eventEditors || '<div class="empty-state">ยังไม่มี Event card</div>'}</div>
       </section>
 
@@ -198,9 +204,9 @@
       </section>
 
       <section class="panel">
-        <div class="panel-heading"><div><p class="section-kicker">PAST TOURNAMENTS</p><h2>Select tournament history</h2><p>เลือกผลการแข่งขันจากรายการเดิม การ์ดจะดึงชื่อ ประเภท ทีมชนะ และจำนวนทีมจากฐานข้อมูล</p></div></div>
+        <div class="panel-heading"><div><p class="section-kicker">PAST TOURNAMENTS</p><h2>Select tournament history</h2><p>เลือกรายการเดิมเพื่อแสดงผลการแข่งขัน โดยไม่แก้ไขข้อมูล Tournament และใช้ปุ่มลูกศรเรียงการ์ดจากซ้ายไปขวา (หน้าเว็บแสดง 6 การ์ดแรกก่อน)</p></div></div>
         <div class="tournament-list">${selectableTournaments || '<p class="empty-state">ยังไม่มี Tournament ในระบบ</p>'}</div>
-        ${pastMediaEditors ? `<div class="past-media-list"><p class="field-label">CARD IMAGE AND POPUP DETAILS</p>${pastMediaEditors}</div>` : '<p class="section-note">เลือก Tournament ด้านบนเพื่อเพิ่มภาพและรายละเอียด popup ของแต่ละรายการ</p>'}
+        ${pastMediaEditors ? `<div class="past-media-list"><p class="field-label">PUBLISHED CARD ORDER · CARD IMAGE AND POPUP DETAILS</p>${pastMediaEditors}</div>` : '<p class="section-note">เลือก Tournament ด้านบนเพื่อเพิ่มภาพและรายละเอียด popup ของแต่ละรายการ</p>'}
       </section>
 
       <section class="panel">
@@ -225,6 +231,22 @@
     document.querySelectorAll("[data-remove-event]").forEach((button) => button.addEventListener("click", () => {
       captureForm();
       content.upcomingEvents.splice(Number(button.dataset.removeEvent), 1);
+      renderEditor();
+    }));
+    document.querySelectorAll("[data-move-event]").forEach((button) => button.addEventListener("click", () => {
+      captureForm();
+      const index = Number(button.dataset.moveEvent);
+      const targetIndex = index + Number(button.dataset.direction);
+      if (targetIndex < 0 || targetIndex >= content.upcomingEvents.length) return;
+      [content.upcomingEvents[index], content.upcomingEvents[targetIndex]] = [content.upcomingEvents[targetIndex], content.upcomingEvents[index]];
+      renderEditor();
+    }));
+    document.querySelectorAll("[data-move-past]").forEach((button) => button.addEventListener("click", () => {
+      captureForm();
+      const index = content.pastTournamentIds.indexOf(button.dataset.movePast);
+      const targetIndex = index + Number(button.dataset.direction);
+      if (index < 0 || targetIndex < 0 || targetIndex >= content.pastTournamentIds.length) return;
+      [content.pastTournamentIds[index], content.pastTournamentIds[targetIndex]] = [content.pastTournamentIds[targetIndex], content.pastTournamentIds[index]];
       renderEditor();
     }));
     document.querySelector("#add-work").addEventListener("click", () => {
