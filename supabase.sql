@@ -133,13 +133,17 @@ end $$;
 
 -- โลโก้ทีม: PNG/JPG/JPEG ขนาดสูงสุด 5 MB
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('team-logos', 'team-logos', true, 5242880, array['image/png', 'image/jpeg'])
-on conflict (id) do update set public = true, file_size_limit = 5242880, allowed_mime_types = array['image/png', 'image/jpeg'];
+values ('team-logos', 'team-logos', true, 5242880, array['image/png', 'image/jpeg', 'image/webp'])
+on conflict (id) do update set public = true, file_size_limit = 5242880, allowed_mime_types = array['image/png', 'image/jpeg', 'image/webp'];
 
 drop policy if exists "public logo access" on storage.objects;
 drop policy if exists "admin upload logos" on storage.objects;
+drop policy if exists "admins update team logos" on storage.objects;
 create policy "public logo access" on storage.objects for select using (bucket_id = 'team-logos');
 create policy "admin upload logos" on storage.objects for insert to authenticated with check (bucket_id = 'team-logos');
+create policy "admins update team logos" on storage.objects for update to authenticated
+using (bucket_id = 'team-logos' and (storage.foldername(name))[1] = (select auth.uid()::text))
+with check (bucket_id = 'team-logos' and (storage.foldername(name))[1] = (select auth.uid()::text));
 
 -- Public homepage content managed from /website in the tournament manager.
 create table if not exists public.site_content (
@@ -167,11 +171,23 @@ on conflict (id) do update set
 
 drop policy if exists "public homepage media access" on storage.objects;
 drop policy if exists "admins upload homepage media" on storage.objects;
+drop policy if exists "admins update homepage media" on storage.objects;
 create policy "public homepage media access" on storage.objects
 for select using (bucket_id = 'site-media');
 
 create policy "admins upload homepage media" on storage.objects
 for insert to authenticated
+with check (
+  bucket_id = 'site-media'
+  and (storage.foldername(name))[1] = (select auth.uid()::text)
+);
+
+create policy "admins update homepage media" on storage.objects
+for update to authenticated
+using (
+  bucket_id = 'site-media'
+  and (storage.foldername(name))[1] = (select auth.uid()::text)
+)
 with check (
   bucket_id = 'site-media'
   and (storage.foldername(name))[1] = (select auth.uid()::text)

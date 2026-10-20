@@ -135,7 +135,7 @@
 
   function imageField(name, url, label, scope, key) {
     return `<div class="image-field">
-      <label class="field"><span>${label} · JPG, PNG OR WEBP (MAX 20 MB)</span><input type="file" accept="image/jpeg,image/png,image/webp" data-upload-scope="${scope}" data-upload-key="${escapeHtml(key)}"></label>
+      <label class="field"><span>${label} · WEBP 960×540 (MAX SOURCE 5 MB · OUTPUT 500 KB)</span><input type="file" accept="image/jpeg,image/png,image/webp" data-upload-scope="${scope}" data-upload-key="${escapeHtml(key)}"></label>
       <input type="hidden" name="${name}" value="${escapeHtml(url || "")}">
       ${url ? `<div class="image-preview"><img src="${escapeHtml(url)}" alt="Current image"><button class="button danger" type="button" data-clear-image="${name}">REMOVE IMAGE</button></div>` : '<p class="image-empty">No image selected.</p>'}
       <span class="upload-state" data-upload-state="${name}" aria-live="polite"></span>
@@ -287,8 +287,8 @@
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
       return showNotice("เลือกรูป JPG, PNG หรือ WEBP เท่านั้น", "error");
     }
-    if (file.size > 20 * 1024 * 1024) {
-      return showNotice("รูปต้องมีขนาดไม่เกิน 20 MB", "error");
+    if (file.size > 5 * 1024 * 1024) {
+      return showNotice("ภาพการ์ดต้นฉบับต้องมีขนาดไม่เกิน 5 MB", "error");
     }
 
     captureForm();
@@ -373,23 +373,25 @@
       });
       canvas.addEventListener("pointerup", () => { dragPoint = null; });
       canvas.addEventListener("pointercancel", () => { dragPoint = null; });
-      confirmButton.addEventListener("click", () => {
+      confirmButton.addEventListener("click", async () => {
         confirmButton.disabled = true;
-        canvas.toBlob((blob) => {
-          if (!blob) {
-            confirmButton.disabled = false;
-            cropError.textContent = "เตรียมรูปที่ crop ไม่สำเร็จ กรุณาลองใหม่";
-            return;
-          }
-          const extension = file.type === "image/jpeg" ? "jpg" : file.type === "image/png" ? "png" : "webp";
-          const cropped = new File([blob], file.name.replace(/\.[^.]+$/, "") + `-cropped.${extension}`, { type: file.type });
-          if (cropped.size > 20 * 1024 * 1024) {
-            confirmButton.disabled = false;
-            cropError.textContent = "รูปหลัง crop ต้องมีขนาดไม่เกิน 20 MB";
-            return;
-          }
-          finish(cropped);
-        }, file.type, file.type === "image/png" ? undefined : 0.92);
+        let blob = null;
+        for (const quality of [0.82, 0.72, 0.62, 0.52]) {
+          blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/webp", quality));
+          if (!blob || blob.size <= 500 * 1024) break;
+        }
+        if (!blob) {
+          confirmButton.disabled = false;
+          cropError.textContent = "บีบอัดรูปไม่สำเร็จ กรุณาลองใหม่";
+          return;
+        }
+        const cropped = new File([blob], file.name.replace(/\.[^.]+$/, "") + "-cropped.webp", { type: "image/webp" });
+        if (cropped.size > 500 * 1024) {
+          confirmButton.disabled = false;
+          cropError.textContent = "ภาพหลังบีบอัดยังเกิน 500 KB กรุณาปรับ crop หรือเลือกภาพที่เรียบง่ายกว่า";
+          return;
+        }
+        finish(cropped);
       });
       document.addEventListener("keydown", closeOnEscape);
       image.onerror = () => {
@@ -407,11 +409,10 @@
     const stateName = scope === "event" ? `eventImageUrl${key}` : scope === "work" ? `workImageUrl${key}` : `pastImageUrl-${key}`;
     const stateNode = document.querySelector(`[data-upload-state="${CSS.escape(stateName)}"]`);
     if (stateNode) stateNode.textContent = "UPLOADING…";
-    const extension = file.type === "image/jpeg" ? "jpg" : file.type === "image/png" ? "png" : "webp";
-    const path = `${user.id}/homepage/${scope}-${key}-${Date.now()}.${extension}`;
+    const path = `${user.id}/homepage/${scope}-${key}.webp`;
     const { data, error } = await db.storage.from(MEDIA_BUCKET).upload(path, file, {
       contentType: file.type,
-      upsert: false,
+      upsert: true,
     });
     if (error) {
       if (stateNode) stateNode.textContent = "";
