@@ -1,4 +1,4 @@
-const SUPABASE_URL='https://dfjffbzbmkitmnsiifib.supabase.co',KEY='sb_publishable_ntEqcHgqsbxQbg_18j_ztg_IdYZcyfu',db=window.supabase?.createClient(SUPABASE_URL,KEY),app=document.querySelector('#app'),bucket='team-logos',OVERLAY_TEAM_LIMIT=18;
+const SUPABASE_URL='https://wpjctaksuseilbykjzsc.supabase.co',KEY='sb_publishable_SyE9TtslyUBMtp4NBPxm_g_9OelAXlk',db=window.supabase?.createClient(SUPABASE_URL,KEY),app=document.querySelector('#app'),bucket='team-logos',OVERLAY_TEAM_LIMIT=18;
 let teams=[],tournaments=[],categories=[],tournament=null,maps=[],scores=[],draft={},user=null,oldPos=new Map(),oldRanks=new Map(),uploadId=null,editingTotalId=null,editingKillsId=null;
 const scoreSyncTimers=new Map(),scoreSyncQueues=new Map();let realtimeScoreRefresh=null,observerRosterDirty=false;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

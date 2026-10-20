@@ -1,6 +1,6 @@
 (() => {
-  const SUPABASE_URL = "https://dfjffbzbmkitmnsiifib.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_ntEqcHgqsbxQbg_18j_ztg_IdYZcyfu";
+  const SUPABASE_URL = "https://wpjctaksuseilbykjzsc.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_SyE9TtslyUBMtp4NBPxm_g_9OelAXlk";
   const MEDIA_BUCKET = "site-media";
   const app = document.querySelector("#app");
   const notice = document.querySelector("#notice");
